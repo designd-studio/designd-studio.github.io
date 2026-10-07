@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DesignD Studio</title>
+<meta name="description" content="Unreal Engine 5 environments and small, finished Unity games by DesignD Studio.">
+<meta property="og:title" content="DesignD Studio">
+<meta property="og:description" content="Unreal Engine 5 environments and small, finished Unity games.">
+<meta property="og:image" content="https://designd-studio.github.io/assets/ue/island-1.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* DesignD brand: Ink #2B1D18, Terracotta #E07A3F, Paper #F6F0EA.
+       The page runs darker than Ink so the films carry the colour. */
+    --bg: #0e0b0a;
+    --bg-2: #17110f;
+    --line: #2b2320;
+    --text: #f6f0ea;        /* Paper */
+    --muted: #a59b93;
+    --faint: #6f655e;
+    --accent: #e07a3f;      /* Terracotta */
+    --ink: #2b1d18;
+    --serif: "Instrument Serif", Georgia, serif;
+    --sans: "Manrope", system-ui, sans-serif;
+    --brand: "Space Grotesk", "Manrope", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --gutter: clamp(16px, 4vw, 56px);
+    --max: 1320px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 16px/1.65 var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  img, video { display: block; max-width: 100%; }
+  a { color: inherit; }
+  ::selection { background: var(--accent); color: #111; }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+  .label {
+    font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- header ---------- */
+  header.top {
+    position: fixed; inset: 0 0 auto 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px var(--gutter);
+    transition: background .3s, backdrop-filter .3s;
+  }
+  header.top.solid { background: rgba(11,12,14,.82); backdrop-filter: blur(12px); }
+  /* Primary lockup from the brand sheet: twin-D mark, then the wordmark. */
+  .mark { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+  .mark svg { width: 45px; height: 30px; flex: none; transition: transform .4s cubic-bezier(.2,.7,.2,1); }
+  .mark:hover svg { transform: scale(1.06); }
+  .mark .wm { display: grid; line-height: 1; }
+  .mark b { font: 700 21px/1 var(--brand); letter-spacing: -.01em; }
+  .mark b i { font-style: normal; color: var(--accent); }
+  .mark small { font: 500 9px/1 var(--brand); letter-spacing: .38em; color: var(--muted); margin-top: 4px; }
+  nav.links { display: flex; gap: clamp(14px, 3vw, 32px); }
+  nav.links a { text-decoration: none; font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); transition: color .2s; }
+  nav.links a:hover { color: var(--text); }
+  @media (max-width: 560px) {
+    .mark { gap: 8px; } .mark svg { width: 36px; height: 24px; } .mark b { font-size: 17px; } .mark small { display: none; }
+    nav.links { gap: 14px; }
+    nav.links a { font-size: 10.5px; letter-spacing: .06em; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+  .hero video, .hero .poster {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(11,12,14,.55) 0%, rgba(11,12,14,0) 30%, rgba(11,12,14,.15) 55%, var(--bg) 100%);
+  }
+  .hero-copy {
+    position: absolute; z-index: 2; left: 0; right: 0; bottom: clamp(120px, 17vh, 190px);
+    will-change: opacity, transform;
+  }
+
+  /* Scroll-scrubbed hero: the section is tall, the picture is pinned, and the
+     scroll position inside it decides which frame of the film is showing. */
+  .hero-scrub { height: 360vh; position: relative; }
+  .hero-scrub .hero { position: sticky; top: 0; }
+  .shot-names { list-style: none; margin: 0; padding: 0; position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+  .shot-names li {
+    position: absolute; left: var(--gutter); bottom: clamp(120px, 17vh, 190px);
+    font: 400 clamp(40px, 6.5vw, 104px)/1 var(--serif); opacity: 0; transform: translateY(16px);
+    transition: opacity .6s, transform .6s cubic-bezier(.2,.7,.2,1);
+  }
+  .shot-names li .label { display: block; margin-bottom: 14px; }
+  .shot-names li.on { opacity: 1; transform: none; }
+  .scroll-cue { position: absolute; z-index: 2; right: var(--gutter); bottom: clamp(120px, 17vh, 190px); display: grid; justify-items: center; gap: 10px; transition: opacity .4s; }
+  .scroll-cue i { width: 1px; height: 54px; background: linear-gradient(var(--text), transparent); animation: cue 2.2s ease-in-out infinite; transform-origin: top; }
+  @keyframes cue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+  .stats {
+    position: absolute; z-index: 3; left: 0; right: 0; bottom: 24px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .stats > div {
+    padding: 16px 20px; background: rgba(11,12,14,.42); backdrop-filter: blur(14px);
+    border: 1px solid rgba(233,230,223,.12); border-left-width: 0;
+  }
+  .stats > div:first-child { border-left-width: 1px; border-radius: 8px 0 0 8px; }
+  .stats > div:last-child { border-radius: 0 8px 8px 0; }
+  .stats dt { font: 400 34px/1 var(--serif); color: var(--text); }
+  .stats dd { margin: 6px 0 0; font: 500 11px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  @media (max-width: 700px) {
+    .stats { grid-template-columns: repeat(2, 1fr); bottom: 16px; }
+    .stats > div { padding: 12px 14px; border-left-width: 1px; border-radius: 0 !important; }
+    .stats dt { font-size: 26px; }
+    .hero-copy, .shot-names li, .scroll-cue { bottom: 214px; }
+    .scroll-cue { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scrub { height: auto; }
+    .shot-names, .scroll-cue { display: none; }
+  }
+
+  /* ---------- film band ---------- */
+  .band { position: relative; height: clamp(420px, 82vh, 860px); overflow: hidden; }
+  .band img { position: absolute; left: 0; width: 100%; height: 130%; top: -15%; object-fit: cover; will-change: transform; }
+  .band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg) 0%, rgba(14,11,10,.15) 22%, rgba(14,11,10,.25) 70%, var(--bg-2) 100%); }
+  .band-copy { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 22px; }
+  .band-line { font: 400 clamp(44px, 7.5vw, 120px)/.98 var(--serif); margin: 0; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
+  .band-line em { color: var(--accent); }
+
+  /* ---------- process ---------- */
+  .process { padding: 0; margin-top: 0; display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: clamp(64px, 9vw, 120px); }
+  @media (min-width: 700px) { .process { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .process { grid-template-columns: repeat(4, 1fr); } }
+  .process li { list-style: none; background: var(--bg); padding: 30px 26px 34px; position: relative; overflow: hidden; }
+  .process .n { font: 400 64px/1 var(--serif); color: var(--accent); display: block; margin-bottom: 18px; }
+  .process h4 { font: 600 17px/1.3 var(--sans); margin: 0 0 8px; }
+  .process p { color: var(--muted); margin: 0; font-size: 15px; }
+  .process li::after { content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+  .process li:hover::after { transform: scaleX(1); }
+  .hero h1 {
+    font: 400 clamp(46px, 8.4vw, 132px)/.95 var(--serif); margin: 18px 0 22px; letter-spacing: -.01em;
+    max-width: 13ch; text-wrap: balance;
+  }
+  .hero h1 em { color: var(--accent); }
+  .hero p { max-width: 46ch; color: #cfcbc2; font-size: clamp(16px, 1.4vw, 19px); margin: 0 0 30px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 13px 22px; border-radius: 999px; text-decoration: none;
+    font: 500 13px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+    border: 1px solid rgba(233,230,223,.28); transition: background .2s, color .2s, border-color .2s;
+  }
+  .btn:hover { border-color: var(--text); }
+  .btn.solid { background: var(--text); color: #111; border-color: var(--text); }
+  .btn.solid:hover { background: var(--accent); border-color: var(--accent); }
+
+  /* ---------- section heads ---------- */
+  section.block { padding: clamp(80px, 12vw, 160px) 0 0; }
+  .head { display: grid; grid-template-columns: 1fr; gap: 18px; margin-bottom: clamp(40px, 6vw, 72px); }
+  @media (min-width: 900px) { .head { grid-template-columns: 1fr 1fr; align-items: end; } }
+  .head h2 { font: 400 clamp(40px, 6vw, 84px)/1 var(--serif); margin: 14px 0 0; letter-spacing: -.01em; }
+  .head p { color: var(--muted); max-width: 52ch; margin: 0; }
+
+  /* ---------- environments ---------- */
+  .env { padding-bottom: clamp(64px, 9vw, 120px); }
+  .env + .env { border-top: 1px solid var(--line); padding-top: clamp(64px, 9vw, 120px); }
+  .player {
+    position: relative; aspect-ratio: 2.39 / 1; background: #000; overflow: hidden; border-radius: 6px;
+    cursor: pointer;
+  }
+  .player.wide { aspect-ratio: 16 / 9; }
+  .player img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(.2,.7,.2,1), filter .6s; filter: brightness(.88); }
+  .player:hover img { transform: scale(1.025); filter: brightness(1); }
+  .player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .play {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+    width: 84px; height: 84px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(11,12,14,.45); backdrop-filter: blur(8px);
+    border: 1px solid rgba(233,230,223,.35);
+    transition: transform .3s, background .3s;
+  }
+  .player:hover .play { transform: scale(1.08); background: rgba(224,122,63,.92); }
+  .play svg { width: 24px; height: 24px; margin-left: 4px; fill: var(--text); }
+  .player:hover .play svg { fill: #111; }
+  .player .runtime {
+    position: absolute; left: 16px; bottom: 14px;
+    font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #ddd;
+    background: rgba(0,0,0,.45); padding: 7px 10px; border-radius: 4px;
+  }
+
+  .env-body { display: grid; gap: 28px; margin-top: 32px; }
+  @media (min-width: 900px) { .env-body { grid-template-columns: 5fr 7fr; gap: 56px; } }
+  .env-body h3 { font: 400 clamp(34px, 4.2vw, 58px)/1 var(--serif); margin: 12px 0 0; }
+  .env-body p { color: #c9c5bc; margin: 0 0 18px; max-width: 60ch; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; padding: 0; list-style: none; }
+  .tags li { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); padding: 7px 10px; border-radius: 999px; }
+
+  .stills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 28px; }
+  @media (min-width: 700px) { .stills { grid-template-columns: repeat(4, 1fr); } }
+  .stills button {
+    padding: 0; border: 0; background: #000; cursor: zoom-in; border-radius: 4px; overflow: hidden;
+    aspect-ratio: 16 / 9;
+  }
+  .stills img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .3s; opacity: .85; }
+  .stills button:hover img, .stills button:focus-visible img { transform: scale(1.05); opacity: 1; }
+  .stills button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .yt { display: inline-flex; gap: 8px; align-items: center; font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-decoration: none; margin-top: 6px; }
+  .yt:hover { color: var(--text); }
+  .yt + .yt { margin-left: 18px; }
+
+  /* ---------- games ---------- */
+  .games-bg { background: var(--bg-2); padding-bottom: clamp(80px, 12vw, 160px); }
+  .game { display: grid; gap: 28px; padding: clamp(40px, 6vw, 72px) 0; }
+  .game + .game { border-top: 1px solid var(--line); }
+  @media (min-width: 980px) {
+    .game { grid-template-columns: 7fr 5fr; gap: 56px; align-items: start; }
+    .game.flip .media { order: 2; }
+  }
+  .media video { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 6px; object-fit: cover; }
+  .game .stills { grid-template-columns: repeat(3, 1fr); margin-top: 8px; }
+  .game .stills.hero-still { grid-template-columns: 1fr; margin-top: 0; }
+  .stills.hero-still button { position: relative; border-radius: 6px; }
+  .stills.hero-still img { opacity: 1; }
+  .game h3 { font: 400 clamp(38px, 4.6vw, 64px)/1 var(--serif); margin: 12px 0 10px; }
+  .game .tagline { font: 400 italic clamp(19px, 1.7vw, 23px)/1.4 var(--serif); color: var(--accent); margin: 0 0 18px; }
+  .game p { color: #c9c5bc; margin: 0 0 16px; }
+  .meta { display: grid; grid-template-columns: auto 1fr; gap: 8px 22px; margin: 22px 0 26px; font-size: 14px; }
+  .meta dt { font: 500 11px/1.9 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .meta dd { margin: 0; color: var(--text); }
+
+  /* ---------- props ---------- */
+  #props { padding-bottom: clamp(80px, 12vw, 140px); border-bottom: 1px solid var(--line); }
+  .props { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 800px) { .props { grid-template-columns: repeat(3, 1fr); } }
+  .props button {
+    position: relative; padding: 0; border: 0; cursor: zoom-in; overflow: hidden; border-radius: 6px;
+    aspect-ratio: 1 / 1; background: #2a2a2a;
+  }
+  .props img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  .props button:hover img, .props button:focus-visible img { transform: scale(1.06); }
+  .props span {
+    position: absolute; left: 12px; bottom: 12px; font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text); background: rgba(14,11,10,.7); backdrop-filter: blur(6px); padding: 7px 10px; border-radius: 4px;
+  }
+  .props button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- contact ---------- */
+  .contact { padding-bottom: clamp(80px, 12vw, 140px); display: grid; gap: 18px; justify-items: start; }
+  .contact-mail {
+    font: 400 clamp(30px, 6vw, 88px)/1.05 var(--serif); text-decoration: none; overflow-wrap: anywhere;
+    background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 2px no-repeat; transition: background-size .5s cubic-bezier(.2,.7,.2,1), color .3s;
+  }
+  .contact-mail:hover { color: var(--accent); background-size: 100% 2px; }
+  .contact p { color: var(--muted); margin: 0; }
+
+  /* ---------- about ---------- */
+  .about { display: grid; gap: 40px; padding-bottom: clamp(56px, 7vw, 88px); }
+  .about-more { display: grid; gap: 48px; padding-bottom: clamp(56px, 7vw, 88px); border-top: 1px solid var(--line); padding-top: clamp(48px, 6vw, 72px); }
+  @media (min-width: 980px) { .about-more { grid-template-columns: 5fr 4fr 4fr; gap: 56px; } }
+  .about-more .kit { grid-template-columns: 1fr; margin-top: 18px; }
+  .asset-card { text-decoration: none; display: block; }
+  .asset-img { position: relative; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; background: #000; }
+  .asset-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+  .asset-card:hover .asset-img img { transform: scale(1.04); }
+  .pill { position: absolute; left: 14px; top: 14px; background: var(--accent); color: var(--ink); font: 700 11px/1 var(--brand); letter-spacing: .08em; text-transform: uppercase; padding: 7px 11px; border-radius: 999px; }
+  .asset-card h4 { font: 400 32px/1.1 var(--serif); margin: 20px 0 8px; }
+  .asset-card p { color: #cdc4bc; margin: 0 0 12px; }
+  .asset-card:hover .yt { color: var(--accent); }
+  .timeline { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .timeline li { display: grid; grid-template-columns: 64px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .timeline b { font: 400 26px/1 var(--serif); color: var(--accent); font-weight: 400; }
+  .timeline span { color: #cdc4bc; font-size: 15px; }
+  @media (min-width: 900px) { .about { grid-template-columns: 1fr 1fr; gap: 80px; } }
+  .about .lead { font: 400 clamp(28px, 3.2vw, 44px)/1.18 var(--serif); margin: 14px 0 0; }
+  .about p { color: #c9c5bc; margin: 0 0 18px; }
+  .kit { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; margin: 26px 0 0; border-top: 1px solid var(--line); }
+  .kit div { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .kit b { display: block; font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; font-weight: 500; }
+
+  footer { border-top: 1px solid var(--line); padding: 36px 0 44px; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; align-items: center; }
+  footer nav { display: flex; flex-wrap: wrap; gap: 24px; }
+  footer a { text-decoration: none; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  footer a:hover { color: var(--text); }
+  footer small { color: var(--faint); font: 400 12px/1 var(--mono); }
+
+  /* ---------- lightbox ---------- */
+  dialog.lb {
+    border: 0; padding: 0; background: transparent; max-width: 94vw; max-height: 92vh; overflow: visible;
+  }
+  dialog.lb::backdrop { background: rgba(5,5,6,.92); backdrop-filter: blur(4px); }
+  dialog.lb img { max-width: 94vw; max-height: 86vh; border-radius: 4px; }
+  dialog.lb .cap { color: var(--muted); font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; margin-top: 14px; display: flex; justify-content: space-between; gap: 20px; }
+  .lb-btn {
+    position: fixed; top: 50%; translate: 0 -50%; width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: var(--text);
+    font-size: 22px; cursor: pointer;
+  }
+  .lb-btn:hover { background: rgba(255,255,255,.18); }
+  .lb-prev { left: 16px; } .lb-next { right: 16px; }
+  .lb-close { position: fixed; top: 16px; right: 16px; translate: none; }
+
+  /* ---------- reveal ---------- */
+  .rv { opacity: 0; transform: translateY(24px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .rv.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .rv { opacity: 1; transform: none; transition: none; }
+    .player img, .stills img { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <a class="mark" href="#" aria-label="DesignD Studio, back to top">
+    <svg viewBox="0 0 150 100" aria-hidden="true"><path d="M18 8 H50 A42 42 0 0 1 50 92 H18 Z M35 26 H49 A24 24 0 0 1 49 74 H35 Z" fill-rule="evenodd" fill="#F6F0EA"/><path d="M18 8 H50 A42 42 0 0 1 50 92 H18 Z M35 26 H49 A24 24 0 0 1 49 74 H35 Z" fill-rule="evenodd" fill="#E07A3F" transform="translate(150,0) scale(-1,1)"/></svg>
+    <span class="wm"><b>Design<i>D</i></b><small>STUDIO</small></span>
+  </a>
+  <nav class="links">
+    <a href="#environments">Environments</a>
+    <a href="#games">Games</a>
+    <a href="#about">About</a>
+  </nav>
+</header>
+
+<section class="hero-scrub" id="hero">
+ <div class="hero">
+  <img class="poster" src="assets/ue/island-1.jpg" alt="">
+  <video id="scrub" muted playsinline preload="auto" poster="assets/ue/island-1.jpg" aria-hidden="true"></video>
+  <ol class="shot-names" aria-hidden="true">
+    <li><span class="label">Unreal Engine 5 · 2025</span>Lost on the Island</li>
+    <li><span class="label">Unreal Engine 5 · 2025</span>Melancholy Hill</li>
+    <li><span class="label">Unreal Engine 5 · 2025</span>The Alley, by day</li>
+    <li><span class="label">Unreal Engine 5 · 2025</span>The Alley, by night</li>
+  </ol>
+  <div class="scroll-cue" aria-hidden="true"><span class="label">Scroll</span><i></i></div>
+  <div class="hero-copy wrap">
+    <span class="label">Unreal Engine 5 · Unity · Solo</span>
+    <h1>Places to look at, and <em>games</em> to sit in.</h1>
+    <p>Cinematic environments built and shot in Unreal Engine 5, and small, finished games made in Unity, all by one person.</p>
+    <div class="btns">
+      <a class="btn solid" href="#environments">See the environments</a>
+      <a class="btn" href="#games">Play the games</a>
+    </div>
+  </div>
+  <dl class="stats wrap">
+    <div><dt>3</dt><dd>UE5 environment films</dd></div>
+    <div><dt>3</dt><dd>Games released</dd></div>
+    <div><dt>4K</dt><dd>Cinematic renders</dd></div>
+    <div><dt>1</dt><dd>Studio, start to finish</dd></div>
+  </dl>
+ </div>
+</section>
+
+<!-- ======================= ENVIRONMENTS ======================= -->
+<section class="block" id="environments">
+  <div class="wrap">
+    <div class="head rv">
+      <div>
+        <span class="label">01 / Unreal Engine 5</span>
+        <h2>Environments</h2>
+      </div>
+      <p>Each one is built, lit, and shot as a short film in Unreal Engine 5, from the layout and set dressing to the lighting, camera work and grade.</p>
+    </div>
+
+    <!-- Lost on the Island -->
+    <article class="env" data-gallery="island">
+      <div class="player rv" data-yt="f7qI7BnBzfI" role="button" tabindex="0" aria-label="Play Lost on the Island">
+        <img src="assets/ue/island-1.jpg" alt="A figure sits on a rock ledge above turquoise water inside a sea cave" loading="lazy" width="1920" height="800">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
+        <span class="runtime">5:31 · 4K</span>
+      </div>
+      <div class="env-body rv">
+        <div>
+          <span class="label">2025 · Music video</span>
+          <h3>Lost on the Island</h3>
+        </div>
+        <div>
+          <p>A castaway's island of limestone cliffs, scrub and clear shallow water, made for the music video <i>Melodies of Time</i>. The hard part was the water: reading as turquoise over sand, dark over rock, and clear enough to see the stones on the bottom of the cove.</p>
+          <ul class="tags"><li>UE5</li><li>Lumen</li><li>Water</li><li>Foliage</li><li>Sequencer</li><li>4K</li></ul>
+          <div class="stills">
+            <button data-full="assets/ue/island-1.jpg" aria-label="View still 1"><img src="assets/ue/island-1.jpg" alt="Sea cave with turquoise water" loading="lazy"></button>
+            <button data-full="assets/ue/island-2.jpg" aria-label="View still 2"><img src="assets/ue/island-2.jpg" alt="A wooden boat wreck in a shallow cove" loading="lazy"></button>
+            <button data-full="assets/ue/island-3.jpg" aria-label="View still 3"><img src="assets/ue/island-3.jpg" alt="Limestone peaks covered in green scrub against a blue sky" loading="lazy"></button>
+            <button data-full="assets/ue/island-4.jpg" aria-label="View still 4"><img src="assets/ue/island-4.jpg" alt="A figure on a beach between two cliffs" loading="lazy"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Melancholy Hill -->
+    <article class="env" data-gallery="hill">
+      <div class="player rv" data-yt="f5QSyysd58I" role="button" tabindex="0" aria-label="Play Melancholy Hill">
+        <img src="assets/ue/hill-2.jpg" alt="Tall grass in the foreground of a wide plain under a soft sky, mountains on the horizon" loading="lazy" width="1920" height="800">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
+        <span class="runtime">4K cinematic</span>
+      </div>
+      <div class="env-body rv">
+        <div>
+          <span class="label">2025 · Music cinematic</span>
+          <h3>Melancholy Hill</h3>
+        </div>
+        <div>
+          <p>A cinematic set to a cover of Gorillaz' <i>On Melancholy Hill</i>. A man runs through wind-blown grassland, past a tin-roofed cabin and down an empty road towards the mountains. The whole piece rests on the grass: it moves in every shot, and it has to read from both a drone's height and the runner's ankles.</p>
+          <ul class="tags"><li>UE5</li><li>Landscape</li><li>Grass &amp; wind</li><li>Character</li><li>Sequencer</li></ul>
+          <div class="stills">
+            <button data-full="assets/ue/hill-1.jpg" aria-label="View still 1"><img src="assets/ue/hill-1.jpg" alt="A weathered tin-roofed cabin among gum trees" loading="lazy"></button>
+            <button data-full="assets/ue/hill-2.jpg" aria-label="View still 2"><img src="assets/ue/hill-2.jpg" alt="Grass plain and distant mountains" loading="lazy"></button>
+            <button data-full="assets/ue/hill-3.jpg" aria-label="View still 3"><img src="assets/ue/hill-3.jpg" alt="A runner on a wet road heading towards mountains" loading="lazy"></button>
+            <button data-full="assets/ue/hill-4.jpg" aria-label="View still 4"><img src="assets/ue/hill-4.jpg" alt="Open grassland running to a mountain range" loading="lazy"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- The Alley -->
+    <article class="env" data-gallery="alley">
+      <div class="player wide rv" data-yt="5Sxrxu_2iQQ" role="button" tabindex="0" aria-label="Play The Alley, Part 1">
+        <img src="assets/ue/alley1-1.jpg" alt="A silhouetted figure in a smoky alley lit orange, neon signs overhead" loading="lazy" width="1920" height="1080">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
+        <span class="runtime">Part 1 · 1:50</span>
+      </div>
+      <div class="env-body rv">
+        <div>
+          <span class="label">2025 · Environment, two parts</span>
+          <h3>The Alley</h3>
+        </div>
+        <div>
+          <p>One derelict industrial alley shot twice. Scaffolding, steel walkways, oil drums, hanging cable and neon signs. Part 1 is night: smoke, sparks and a warm grain like old film. Part 2 is the same alley in cold daylight, with every surface on show.</p>
+          <ul class="tags"><li>UE5</li><li>Kitbashing</li><li>Volumetrics</li><li>Niagara sparks</li><li>Two lighting passes</li></ul>
+          <p style="margin-top:16px">
+            <a class="yt" href="https://www.youtube.com/watch?v=5Sxrxu_2iQQ" target="_blank" rel="noopener">Part 1 on YouTube ↗</a>
+            <a class="yt" href="https://www.youtube.com/watch?v=qsHs9-jOq6w" target="_blank" rel="noopener">Part 2 on YouTube ↗</a>
+          </p>
+          <div class="stills">
+            <button data-full="assets/ue/alley1-2.jpg" aria-label="View still 1"><img src="assets/ue/alley1-2.jpg" alt="Steam rising through scaffolding at night" loading="lazy"></button>
+            <button data-full="assets/ue/alley2-1.jpg" aria-label="View still 2"><img src="assets/ue/alley2-1.jpg" alt="Daylight alley with steel walkways overhead" loading="lazy"></button>
+            <button data-full="assets/ue/alley2-2.jpg" aria-label="View still 3"><img src="assets/ue/alley2-2.jpg" alt="Brick buildings and street lamps under industrial bridges" loading="lazy"></button>
+            <button data-full="assets/ue/alley2-3.jpg" aria-label="View still 4"><img src="assets/ue/alley2-3.jpg" alt="Smoke and scaffolding in the daylight alley" loading="lazy"></button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <div class="head rv" style="margin-bottom:40px">
+      <div>
+        <span class="label">How they're made</span>
+        <h2>Four passes</h2>
+      </div>
+      <p>Every environment goes through the same four passes, and the camera comes first. Nothing is built that the lens won't see.</p>
+    </div>
+    <ol class="process rv">
+      <li><span class="n">01</span><h4>Block out</h4><p>Grey shapes and a camera. The shots decide the layout, and the layout decides what gets built.</p></li>
+      <li><span class="n">02</span><h4>Dress</h4><p>Rock, foliage, props and decals, added until the set holds up at the distance the lens sees it from.</p></li>
+      <li><span class="n">03</span><h4>Light</h4><p>Sun, sky, fog and practical lights. This is the pass that makes a place feel like a time of day.</p></li>
+      <li><span class="n">04</span><h4>Shoot &amp; grade</h4><p>Camera moves in Sequencer, rendered at 4K, then graded and cut to music.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- Full-width film band: a breath between the two halves of the page. -->
+<section class="band" aria-label="Still from Melancholy Hill">
+  <img src="assets/ue/hill-3.jpg" alt="A runner on a wet road heading towards mountains, from Melancholy Hill" loading="lazy">
+  <div class="band-copy wrap">
+    <p class="band-line rv">Every place starts<br>with <em>a shot.</em></p>
+    <span class="label">Melancholy Hill · Unreal Engine 5</span>
+  </div>
+</section>
+
+<!-- ======================= GAMES ======================= -->
+<section class="block games-bg" id="games">
+  <div class="wrap">
+    <div class="head rv" style="margin-bottom:0">
+      <div>
+        <span class="label">02 / Unity · C#</span>
+        <h2>Games</h2>
+      </div>
+      <p>Small games, finished and released, plus the one on the bench now. Design, code, art, sound and trailers are all done in-house, and every released game is playable on itch.io.</p>
+    </div>
+
+    <article class="game" data-gallery="tidewrack">
+      <div class="media rv">
+        <video controls preload="none" poster="assets/games/tide-2.jpg" playsinline>
+          <source src="assets/games/tidewrack-trailer.mp4" type="video/mp4">
+        </video>
+        <div class="stills">
+          <button data-full="assets/games/tide-5.jpg" aria-label="View screenshot 1"><img src="assets/games/tide-5.jpg" alt="The pet's card, with what it has brought you" loading="lazy"></button>
+          <button data-full="assets/games/tide-3.jpg" aria-label="View screenshot 2"><img src="assets/games/tide-3.jpg" alt="The display cabinet of found objects" loading="lazy"></button>
+          <button data-full="assets/games/tide-4.jpg" aria-label="View screenshot 3"><img src="assets/games/tide-4.jpg" alt="A gull visiting the beach" loading="lazy"></button>
+        </div>
+      </div>
+      <div class="rv">
+        <span class="label">2026 · Desktop companion</span>
+        <h3>Tidewrack</h3>
+        <p class="tagline">A coastline at the bottom of your screen.</p>
+        <p>A strip of beach sits under your other windows while you work. The tide runs on a real clock and leaves things on the sand: shells, sea glass, bottles, bone. Clean them, identify them, and fill a cabinet. A pet you design dives for more. Leave a spare find out and an animal comes for it.</p>
+        <p>No streaks, no daily rewards, nothing that punishes you for closing it. It is a calm game in a genre built on making you come back.</p>
+        <dl class="meta">
+          <dt>Built in</dt><dd>Unity 6, C#, transparent click-through window</dd>
+          <dt>Content</dt><dd>6 coasts, 54 finds, 12 visitors, storms as prestige</dd>
+          <dt>Price</dt><dd>$1 on itch.io</dd>
+        </dl>
+        <div class="btns"><a class="btn solid" href="https://designdstudio.itch.io/tidewrack" target="_blank" rel="noopener">Get it on itch.io ↗</a></div>
+      </div>
+    </article>
+
+    <article class="game flip" data-gallery="nightshift">
+      <div class="media rv">
+        <video controls preload="none" poster="assets/games/night-1.jpg" playsinline>
+          <source src="assets/games/nightshift-trailer.mp4" type="video/mp4">
+        </video>
+        <div class="stills">
+          <button data-full="assets/games/night-3.jpg" aria-label="View screenshot 1"><img src="assets/games/night-3.jpg" alt="Udin at his desk under the lamp" loading="lazy"></button>
+          <button data-full="assets/games/night-2.jpg" aria-label="View screenshot 2"><img src="assets/games/night-2.jpg" alt="The lights come back on in the office" loading="lazy"></button>
+          <button data-full="assets/games/night-4.jpg" aria-label="View screenshot 3"><img src="assets/games/night-4.jpg" alt="The office in darkness after the fuse goes" loading="lazy"></button>
+        </div>
+      </div>
+      <div class="rv">
+        <span class="label">2026 · Management horror</span>
+        <h3>Night Shift</h3>
+        <p class="tagline">Don't let him go home.</p>
+        <p>Udin works the overnight desk at a lost property office. You are not Udin. You can only send him to things: the phone, the fuse box, the hatch, the back door. Everything you send him to do frightens him, and his nerve only comes back while he sits at his desk doing nothing.</p>
+        <p>Two or three things want him at once, and the far corner really is far. The game is choosing what to let go.</p>
+        <dl class="meta">
+          <dt>Built in</dt><dd>Unity 6, C#, top-down pixel art</dd>
+          <dt>Sound</dt><dd>Synthesised in code: room tone, distant knocks, the hum of a failing tube</dd>
+          <dt>Price</dt><dd>$1 on itch.io</dd>
+        </dl>
+        <div class="btns"><a class="btn solid" href="https://designdstudio.itch.io/night-shift" target="_blank" rel="noopener">Get it on itch.io ↗</a></div>
+      </div>
+    </article>
+
+    <article class="game" data-gallery="rainjar">
+      <div class="media rv">
+        <video controls preload="none" poster="assets/games/rain-1.jpg" playsinline>
+          <source src="assets/games/rainjar-trailer.mp4" type="video/mp4">
+        </video>
+        <div class="stills">
+          <button data-full="assets/games/rain-2.jpg" aria-label="View screenshot 1"><img src="assets/games/rain-2.jpg" alt="Rain falling into the barrel with the upgrade list" loading="lazy"></button>
+          <button data-full="assets/games/rain-3.jpg" aria-label="View screenshot 2"><img src="assets/games/rain-3.jpg" alt="Catching a golden drop" loading="lazy"></button>
+          <button data-full="assets/games/rain-4.jpg" aria-label="View screenshot 3"><img src="assets/games/rain-4.jpg" alt="The barrel full and ready to evaporate" loading="lazy"></button>
+        </div>
+      </div>
+      <div class="rv">
+        <span class="label">2026 · Idle · First game</span>
+        <h3>Rain Jar</h3>
+        <p class="tagline">A jar fills with rain. Spend it to make it rain faster.</p>
+        <p>The first game, made to learn the whole pipeline end to end: a number that grows on a timer, upgrades driven by data, saving, progress while the game is closed, and prestige. Evaporate the barrel for clouds and spend them in a cloud shop that changes what is possible, not only how fast it goes.</p>
+        <dl class="meta">
+          <dt>Built in</dt><dd>Unity 6, C#</dd>
+          <dt>Systems</dt><dd>Offline progress, prestige, golden drops, cloud shop</dd>
+          <dt>Price</dt><dd>Free on itch.io</dd>
+        </dl>
+        <div class="btns"><a class="btn solid" href="https://designdstudio.itch.io/rain-jar" target="_blank" rel="noopener">Play it free ↗</a></div>
+      </div>
+    </article>
+
+    <article class="game flip" data-gallery="wildcode">
+      <div class="media rv">
+        <div class="stills hero-still">
+          <button data-full="assets/games/wild-1.jpg" aria-label="View screenshot 1"><img src="assets/games/wild-1.jpg" alt="Two creatures face off in a side-on battle on a grassy cliff arena" loading="lazy"><span class="pill">In development</span></button>
+        </div>
+        <div class="stills">
+          <button data-full="assets/games/wild-2.jpg" aria-label="View screenshot 2"><img src="assets/games/wild-2.jpg" alt="The tamer and his partner on a dirt path through the island" loading="lazy"></button>
+          <button data-full="assets/games/wild-3.jpg" aria-label="View screenshot 3"><img src="assets/games/wild-3.jpg" alt="A fluffy partner on the beach beside a small boat" loading="lazy"></button>
+          <button data-full="assets/games/wild-4.jpg" aria-label="View screenshot 4"><img src="assets/games/wild-4.jpg" alt="A shopkeeper waving from a beach stall" loading="lazy"></button>
+        </div>
+      </div>
+      <div class="rv">
+        <span class="label">In development · 3D creature RPG</span>
+        <h3>Wildcode</h3>
+        <p class="tagline">Raise one partner. It becomes what you made it.</p>
+        <p>Raise a single creature, called a Wild, on an island where the data shows through the grass. Feed it, train it, praise it or scold it, then command it in side-on battles. How you raise it decides what it grows into, across a branching tree of seven forms.</p>
+        <p>Inspired by the raise-one-partner games of the late nineties, without the part where your creature dies.</p>
+        <dl class="meta">
+          <dt>Built in</dt><dd>Unity 6 (URP), C#, custom toon and water shaders</dd>
+          <dt>Systems</dt><dd>Raising and care, growth branches, real-time battles, tamers, shop</dd>
+          <dt>Status</dt><dd>In development</dd>
+        </dl>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ======================= PROPS ======================= -->
+<section class="block" id="props" data-gallery="props">
+  <div class="wrap">
+    <div class="head rv">
+      <div>
+        <span class="label">03 / Blender</span>
+        <h2>Props</h2>
+      </div>
+      <p>Game-ready set dressing made in Blender, textured and exported for Unreal Engine 5: the small things that make a scene look lived in.</p>
+    </div>
+    <div class="props rv">
+      <button data-full="assets/props/lantern_lit.jpg"><img src="assets/props/lantern_lit.jpg" alt="A lit oil lantern with a glass chimney" loading="lazy"><span>Lantern</span></button>
+      <button data-full="assets/props/crate_final.jpg"><img src="assets/props/crate_final.jpg" alt="A slatted wooden crate" loading="lazy"><span>Crate</span></button>
+      <button data-full="assets/props/barrel_lowpoly.jpg"><img src="assets/props/barrel_lowpoly.jpg" alt="A wooden barrel with iron hoops" loading="lazy"><span>Barrel</span></button>
+      <button data-full="assets/props/firewood_lowpoly.jpg"><img src="assets/props/firewood_lowpoly.jpg" alt="A stack of split firewood" loading="lazy"><span>Firewood</span></button>
+      <button data-full="assets/props/stool_lowpoly.jpg"><img src="assets/props/stool_lowpoly.jpg" alt="A three-legged wooden stool" loading="lazy"><span>Stool</span></button>
+      <button data-full="assets/props/flower_cluster.jpg"><img src="assets/props/flower_cluster.jpg" alt="A hanging installation of sheer white flowers" loading="lazy"><span>Flower installation</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ABOUT ======================= -->
+<section class="block" id="about">
+  <div class="wrap about">
+    <div class="rv">
+      <span class="label">04 / About</span>
+      <p class="lead">DesignD Studio makes places to look at in Unreal Engine, and games to sit in with Unity.</p>
+    </div>
+    <div class="rv">
+      <p>The Unreal work is environments made to be filmed: laid out for the camera, dressed, lit, shot in Sequencer and cut to music. Each one is a short film, not a turntable.</p>
+      <p>The games are small on purpose. Each one is finished and released, and each is as calm or as tense as it set out to be: a beach that lives at the bottom of your screen, a night shift you have to keep someone through, a jar that fills with rain.</p>
+      <p>Everything is made in one studio, from the models and the levels to the code, sound, edits and trailers.</p>
+    </div>
+  </div>
+
+  <div class="wrap about-more">
+    <a class="asset-card rv" href="https://www.youtube.com/watch?v=c-sXv-9M9UA" target="_blank" rel="noopener">
+      <div class="asset-img"><img src="assets/ue/cabin.jpg" alt="A weathered timber cabin on red earth among trees" loading="lazy"><span class="pill">Free asset</span></div>
+      <h4>A free cabin for UE5</h4>
+      <p>A game-ready timber cabin for Unreal Engine 5, given away free. The showcase is on YouTube.</p>
+      <span class="yt">Watch the showcase ↗</span>
+    </a>
+
+    <div class="rv">
+      <span class="label">Timeline</span>
+      <ol class="timeline">
+        <li><b>2025</b><span><i>Lost on the Island</i>, <i>Melancholy Hill</i>, and <i>The Alley</i> parts one and two.</span></li>
+        <li><b>2026</b><span>Three games released on itch.io: <i>Rain Jar</i>, <i>Tidewrack</i> and <i>Night Shift</i>.</span></li>
+        <li><b>Now</b><span>Building <i>Wildcode</i>, a creature-raising RPG in 3D.</span></li>
+      </ol>
+    </div>
+
+    <div class="rv">
+      <span class="label">Toolkit</span>
+      <div class="kit">
+        <div><b>Real-time</b>Unreal Engine 5, Unity 6</div>
+        <div><b>3D</b>Blender</div>
+        <div><b>Code</b>C#, Blueprints, Python</div>
+        <div><b>Film</b>Sequencer, editing, grading</div>
+        <div><b>2D</b>Pixel art, Canva</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap contact rv" id="contact">
+    <span class="label">Contact</span>
+    <a class="contact-mail" href="mailto:designdstudio.business@gmail.com">designdstudio.business<wbr>@gmail.com</a>
+    <p>For environment art, cinematics and small game work.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <nav>
+      <a href="mailto:designdstudio.business@gmail.com">Email</a>
+      <a href="https://www.youtube.com/@designd_studio" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://designdstudio.itch.io" target="_blank" rel="noopener">itch.io</a>
+      <a href="https://x.com/designd_studio" target="_blank" rel="noopener">X</a>
+    </nav>
+    <small>© 2026 DesignD Studio</small>
+  </div>
+</footer>
+
+<dialog class="lb" id="lb" aria-label="Image viewer">
+  <img id="lb-img" alt="">
+  <div class="cap"><span id="lb-alt"></span><span id="lb-count"></span></div>
+  <button class="lb-btn lb-prev" id="lb-prev" aria-label="Previous">‹</button>
+  <button class="lb-btn lb-next" id="lb-next" aria-label="Next">›</button>
+  <button class="lb-btn lb-close" id="lb-close" aria-label="Close">×</button>
+</dialog>
+
+<script>
+  // Header turns solid once you scroll past the top of the hero.
+  const header = document.getElementById('top');
+  const onScroll = () => header.classList.toggle('solid', scrollY > 40);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // ---- Scroll-scrubbed hero ----
+  // The hero section is 360vh tall and its picture is pinned (position: sticky).
+  // How far you are through that section = how far through the film you are.
+  // Scrolling back rewinds it. Visitors who ask for reduced motion get the still.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scrubSection = document.getElementById('hero');
+  const film = document.getElementById('scrub');
+  const copy = document.querySelector('.hero-copy');
+  const cue = document.querySelector('.scroll-cue');
+  const names = [...document.querySelectorAll('.shot-names li')];
+
+  if (!reduced) {
+    // Load the whole file into memory first: seeking a fully-downloaded blob is
+    // instant, while seeking a half-streamed file stalls on every scroll tick.
+    fetch('assets/ue/scrub.mp4').then(r => r.blob()).then(b => {
+      film.src = URL.createObjectURL(b);
+    });
+
+    let shown = 0;  // the time we are easing towards the target, so fast scrolls stay smooth
+    const progress = () => {
+      const r = scrubSection.getBoundingClientRect();
+      const travel = r.height - innerHeight;
+      return Math.min(1, Math.max(0, -r.top / travel));
+    };
+    function tick() {
+      const p = progress();
+      // Text: the headline leaves over the first 12% of the scroll, then each
+      // film's name holds for its quarter of the clip.
+      const fade = Math.min(1, p / 0.12);
+      copy.style.opacity = 1 - fade;
+      copy.style.transform = `translateY(${-40 * fade}px)`;
+      copy.style.pointerEvents = fade > 0.5 ? 'none' : '';
+      cue.style.opacity = 1 - fade;
+      const shot = p < 0.12 ? -1 : Math.min(3, Math.floor(p * 4));
+      names.forEach((li, i) => li.classList.toggle('on', i === shot));
+
+      if (film.duration) {
+        const target = p * (film.duration - 0.05);
+        shown += (target - shown) * 0.25;
+        if (Math.abs(film.currentTime - shown) > 1 / 30) film.currentTime = shown;
+      }
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  // YouTube players load only when clicked, so the page doesn't pull in three
+  // heavy iframes up front (and nothing goes to YouTube until someone asks).
+  document.querySelectorAll('.player[data-yt]').forEach(p => {
+    const start = () => {
+      if (p.querySelector('iframe')) return;
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${p.dataset.yt}?autoplay=1&rel=0`;
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.allowFullscreen = true;
+      f.title = p.getAttribute('aria-label');
+      p.appendChild(f);
+    };
+    p.addEventListener('click', start);
+    p.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(); } });
+  });
+
+  // Lightbox: each project's stills form their own little gallery.
+  const lb = document.getElementById('lb'), lbImg = document.getElementById('lb-img');
+  const lbAlt = document.getElementById('lb-alt'), lbCount = document.getElementById('lb-count');
+  let set = [], idx = 0;
+  const show = i => {
+    idx = (i + set.length) % set.length;
+    const b = set[idx];
+    lbImg.src = b.dataset.full;
+    lbImg.alt = b.querySelector('img').alt;
+    lbAlt.textContent = lbImg.alt;
+    lbCount.textContent = `${idx + 1} / ${set.length}`;
+  };
+  document.querySelectorAll('.stills button, .props button').forEach(b => b.addEventListener('click', () => {
+    set = [...b.closest('[data-gallery]').querySelectorAll('.stills button, .props button')];
+    show(set.indexOf(b)); lb.showModal();
+  }));
+  document.getElementById('lb-prev').onclick = () => show(idx - 1);
+  document.getElementById('lb-next').onclick = () => show(idx + 1);
+  document.getElementById('lb-close').onclick = () => lb.close();
+  lb.addEventListener('click', e => { if (e.target === lb) lb.close(); });
+  addEventListener('keydown', e => {
+    if (!lb.open) return;
+    if (e.key === 'ArrowLeft') show(idx - 1);
+    if (e.key === 'ArrowRight') show(idx + 1);
+  });
+
+  // Film band: the still drifts slower than the page (a light parallax).
+  const band = document.querySelector('.band'), bandImg = band.querySelector('img');
+  if (!reduced) {
+    const drift = () => {
+      const r = band.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < innerHeight) {
+        const p = (innerHeight - r.top) / (innerHeight + r.height);   // 0 → 1 while it passes
+        bandImg.style.transform = `translateY(${(p - 0.5) * -18}%)`;
+      }
+      requestAnimationFrame(drift);
+    };
+    drift();
+  }
+
+  // Fade sections in as they arrive.
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
