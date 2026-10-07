@@ -156,6 +156,11 @@
   .band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg) 0%, rgba(14,11,10,.15) 22%, rgba(14,11,10,.25) 70%, var(--bg-2) 100%); }
   .band-copy { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 22px; }
   .band-line { font: 400 clamp(44px, 7.5vw, 120px)/.98 var(--serif); margin: 0; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
+  /* The credit under the line sits on dark glass, so a bright sky can't wash it out. */
+  .band-copy .label {
+    color: var(--text); background: rgba(14,11,10,.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(246,240,234,.14);
+  }
   .band-line em { color: var(--accent); }
 
   /* ---------- process ---------- */
@@ -289,12 +294,13 @@
   .ticker i { flex: none; width: 34px; height: 22px; display: block;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 100'%3E%3Cpath d='M18 8 H50 A42 42 0 0 1 50 92 H18 Z M35 26 H49 A24 24 0 0 1 49 74 H35 Z' fill-rule='evenodd' fill='%23F6F0EA'/%3E%3Cpath d='M18 8 H50 A42 42 0 0 1 50 92 H18 Z M35 26 H49 A24 24 0 0 1 49 74 H35 Z' fill-rule='evenodd' fill='%23E07A3F' transform='translate(150,0) scale(-1,1)'/%3E%3C/svg%3E") center / contain no-repeat; }
 
-  /* ---------- the one light section (Paper) ---------- */
-  .light { background: var(--text); color: var(--ink); }
-  .light .label { color: #8b7d73; }
-  .light .head p { color: #5c4e46; }
-  .light .props button { background: #e7ded4; }
-  #props.light { border-bottom: 0; }
+  /* ---------- the one Ink section (the brand's warm dark brown) ----------
+     Breaks up the near-black page without going white. */
+  .inked { background: var(--ink); border-top: 1px solid #3a2a23; }
+  .inked .label { color: #b59a8a; }
+  .inked .head p { color: #cdb9ac; }
+  .inked .props button { background: #3a2a23; box-shadow: 0 18px 40px -22px rgba(0,0,0,.7); }
+  #props.inked { border-bottom: 1px solid #3a2a23; }
 
   /* ---------- closing call to action ---------- */
   .cta { padding: clamp(90px, 13vw, 180px) 0 clamp(80px, 11vw, 150px); border-top: 1px solid var(--line); }
@@ -780,7 +786,7 @@
 </section>
 
 <!-- ======================= PROPS ======================= -->
-<section class="block light" id="props" data-gallery="props">
+<section class="block inked" id="props" data-gallery="props">
   <div class="wrap">
     <div class="head rv">
       <div>
@@ -848,7 +854,7 @@
 <section class="cta" id="contact">
   <div class="wrap">
     <span class="label rv">(Start a project)</span>
-    <h2 class="cta-line rv">Got a project<br>in <em>mind?</em></h2>
+    <h2 class="cta-line rv">Every world starts<br>with <em>a message.</em></h2>
     <div class="cta-row rv">
       <!-- Left: what to send, and the other ways in -->
       <div class="cta-info">
