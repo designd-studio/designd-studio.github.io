@@ -317,34 +317,63 @@
   footer a:hover { color: var(--text); }
   footer small { color: var(--faint); font: 400 12px/1 var(--mono); }
 
-  /* ---------- custom cursor ----------
-     Mouse only: touch screens and keyboards never see it. A paper dot sits
-     exactly on the pointer; a ring follows a beat behind. The pair inverts
-     whatever is under it (difference blend), so it reads on the dark page and
-     on bright film stills alike. Over links the ring grows; over media it
-     fills terracotta and names the action (Play / View). */
+  /* ---------- custom cursor: the twin-D lens ----------
+     Mouse only: touch screens and keyboards never see it. A tiny copy of the
+     mark - the paper D and the terracotta D facing each other - trails the
+     pointer and tilts the way you move; a dot sits exactly on the pointer so
+     aiming stays precise. Over links the D's part, like the logo's hover.
+     Over films and stills they slide wide apart and frame the action
+     ("Play", "View") on a dark glass panel: the lens opening onto the shot. */
   .cursor { display: none; }
   @media (hover: hover) and (pointer: fine) {
     html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [role=button], html.has-cursor video { cursor: none; }
     html.has-cursor .cursor { display: block; }
   }
-  .cursor { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; mix-blend-mode: difference; transition: opacity .3s; }
+  .cursor { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; transition: opacity .3s; }
   .cursor.off { opacity: 0; }
-  .cursor-dot, .cursor-ring { position: fixed; left: 0; top: 0; border-radius: 50%; will-change: transform; }
-  .cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--text); transition: opacity .3s, width .3s, height .3s; }
-  .cursor-ring {
-    width: 38px; height: 38px; margin: -19px 0 0 -19px; border: 1px solid var(--text);
-    display: grid; place-items: center;
-    transition: width .45s cubic-bezier(.22,1,.36,1), height .45s cubic-bezier(.22,1,.36,1), margin .45s cubic-bezier(.22,1,.36,1), background .35s, border-color .35s;
+  .cursor-dot {
+    position: fixed; left: 0; top: 0; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%;
+    background: var(--text); box-shadow: 0 0 0 1px rgba(14,11,10,.5); will-change: transform; transition: opacity .25s;
   }
-  .cursor-label { font: 700 10px/1 var(--brand); letter-spacing: .16em; text-transform: uppercase; color: var(--ink); opacity: 0; transition: opacity .25s; }
-  .cursor.is-hover .cursor-ring { width: 64px; height: 64px; margin: -32px 0 0 -32px; }
-  .cursor.is-hover .cursor-dot { opacity: 0; }
-  .cursor.is-label { mix-blend-mode: normal; }
-  .cursor.is-label .cursor-ring { width: 86px; height: 86px; margin: -43px 0 0 -43px; background: var(--accent); border-color: var(--accent); }
-  .cursor.is-label .cursor-label { opacity: 1; }
+  .cursor-lens { position: fixed; left: 0; top: 0; width: 0; height: 0; will-change: transform; filter: drop-shadow(0 1px 2px rgba(0,0,0,.55)); }
+  .cursor-d {
+    position: absolute; top: 0; width: 9px; height: 18px; margin-top: -9px; border: 2px solid;
+    transition: transform .55s cubic-bezier(.34,1.56,.64,1), width .5s cubic-bezier(.22,1,.36,1),
+                height .5s cubic-bezier(.22,1,.36,1), margin .5s cubic-bezier(.22,1,.36,1), border-width .3s;
+  }
+  /* Same faces as the logo: a straight back, the bowl towards the middle. */
+  .cursor-d.l { right: 1px; border-color: var(--text); border-radius: 0 100% 100% 0 / 0 50% 50% 0; }
+  .cursor-d.r { left: 1px; border-color: var(--accent); border-radius: 100% 0 0 100% / 50% 0 0 50%; }
+  .cursor-glass {
+    position: absolute; left: 0; top: 0; width: 0; height: 0; border-radius: 10px;
+    background: rgba(14,11,10,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transform: translate(-50%, -50%); opacity: 0;
+    transition: width .5s cubic-bezier(.22,1,.36,1), height .5s cubic-bezier(.22,1,.36,1), opacity .3s;
+  }
+  .cursor-label {
+    position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); white-space: nowrap;
+    font: 500 11px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--text);
+    opacity: 0; transition: opacity .25s;
+  }
+  .cursor-label.is-play::before { content: "\25B6"; color: var(--accent); margin-right: 8px; font-size: 9px; }
+
+  /* Over a link or button: the lens opens a little. */
+  .cursor.is-hover .cursor-d.l { transform: translateX(-6px); }
+  .cursor.is-hover .cursor-d.r { transform: translateX(6px); }
+  /* Over media: the D's become the sides of a frame around the label. */
+  .cursor.is-label .cursor-d { width: 12px; height: 46px; margin-top: -23px; }
+  .cursor.is-label .cursor-d.l { transform: translateX(-46px); }
+  .cursor.is-label .cursor-d.r { transform: translateX(46px); }
+  .cursor.is-label .cursor-glass { width: 104px; height: 46px; opacity: 1; }
+  .cursor.is-label .cursor-label { opacity: 1; transition-delay: .12s; }
   .cursor.is-label .cursor-dot { opacity: 0; }
-  .cursor.is-down .cursor-ring { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
+  /* With the lens cursor on, the cursor IS the play button: the film's own
+     round button steps aside on hover instead of stacking under it. */
+  html.has-cursor .player:hover .play { opacity: 0; transform: scale(.6); }
+  .player .play { transition: transform .3s, background .3s, opacity .3s; }
+  /* Pressing: the D's snap shut. */
+  .cursor.is-down .cursor-d.l { transform: translateX(2px) scale(.85); }
+  .cursor.is-down .cursor-d.r { transform: translateX(-2px) scale(.85); }
 
   /* ---------- lightbox ---------- */
   dialog.lb {
@@ -728,7 +757,10 @@
   </div>
 </footer>
 
-<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-ring"><span class="cursor-label"></span></span><span class="cursor-dot"></span></div>
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor-lens"><span class="cursor-glass"></span><i class="cursor-d l"></i><i class="cursor-d r"></i><span class="cursor-label"></span></div>
+  <span class="cursor-dot"></span>
+</div>
 
 <dialog class="lb" id="lb" aria-label="Image viewer">
   <img id="lb-img" alt="">
@@ -878,9 +910,9 @@
   if (finePointer) {
     document.documentElement.classList.add('has-cursor');
     const cur = document.getElementById('cursor');
-    const dot = cur.querySelector('.cursor-dot'), ring = cur.querySelector('.cursor-ring');
+    const dot = cur.querySelector('.cursor-dot'), lens = cur.querySelector('.cursor-lens');
     const label = cur.querySelector('.cursor-label');
-    let mx = -100, my = -100, rx = -100, ry = -100;
+    let mx = -100, my = -100, rx = -100, ry = -100, tilt = 0;
     cur.classList.add('off');
 
     // What each kind of thing under the pointer should say.
@@ -902,6 +934,7 @@
       const t = e.target;
       const text = labelFor(t);
       label.textContent = text;
+      label.classList.toggle('is-play', text === 'Play');
       cur.classList.toggle('is-label', !!text);
       cur.classList.toggle('is-hover', !text && !!t.closest('a, button, [role=button]'));
     });
@@ -913,10 +946,16 @@
     addEventListener('mouseup', () => cur.classList.remove('is-down'));
 
     const follow = () => {
-      // The ring trails the dot; with reduced motion it simply keeps up.
-      const k = reduced ? 1 : 0.18;
-      rx += (mx - rx) * k; ry += (my - ry) * k;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+      // The lens trails the dot and leans the way you move (sideways speed
+      // becomes a tilt of up to 14 degrees). It stands straight while it is
+      // framing a label, so the word stays level. With reduced motion it
+      // simply keeps up and never tilts.
+      const k = reduced ? 1 : 0.2;
+      const dx = mx - rx;
+      rx += dx * k; ry += (my - ry) * k;
+      const want = reduced || cur.classList.contains('is-label') ? 0 : Math.max(-14, Math.min(14, dx * 0.35));
+      tilt += (want - tilt) * 0.15;
+      lens.style.transform = `translate3d(${rx}px, ${ry}px, 0) rotate(${tilt.toFixed(2)}deg)`;
       requestAnimationFrame(follow);
     };
     follow();
