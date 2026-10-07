@@ -300,11 +300,56 @@
   .cta { padding: clamp(90px, 13vw, 180px) 0 clamp(80px, 11vw, 150px); border-top: 1px solid var(--line); }
   .cta-line { font: 400 clamp(60px, 12vw, 190px)/.92 var(--serif); margin: 20px 0 clamp(36px, 5vw, 64px); letter-spacing: -.02em; }
   .cta-line em { color: var(--accent); }
-  .cta-row { display: grid; gap: 26px; border-top: 1px solid var(--line); padding-top: 30px; }
-  @media (min-width: 900px) { .cta-row { grid-template-columns: 1fr auto; align-items: center; } }
-  .cta-row p { color: var(--muted); margin: 0; max-width: 42ch; font-size: 17px; }
-  .cta-actions { display: grid; gap: 14px; justify-items: start; }
-  @media (min-width: 900px) { .cta-actions { justify-items: end; } }
+  .cta-row { display: grid; gap: 48px; border-top: 1px solid var(--line); padding-top: 36px; }
+  @media (min-width: 980px) { .cta-row { grid-template-columns: 5fr 7fr; gap: 72px; } }
+  .cta-info > p { color: var(--muted); margin: 0 0 28px; max-width: 42ch; font-size: 17px; }
+  .cta-details { display: grid; grid-template-columns: auto 1fr; gap: 0 22px; margin: 0; border-top: 1px solid var(--line); }
+  .cta-details dt, .cta-details dd { padding: 16px 0; border-bottom: 1px solid var(--line); margin: 0; }
+  .cta-details dt { font: 500 11px/1.9 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+  .cta-details dd { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+  .cta-links a { text-decoration: none; color: var(--text); }
+  .cta-links a:hover { color: var(--accent); }
+  .copy {
+    font: 500 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text);
+    background: transparent; border: 1px solid rgba(246,240,234,.28); border-radius: 999px; padding: 7px 11px; cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .copy:hover { border-color: var(--text); }
+  .copy.done { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+
+  /* The form */
+  .cta-form { display: grid; gap: 20px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: clamp(20px, 3vw, 34px); }
+  .field-row { display: grid; gap: 20px; }
+  @media (min-width: 640px) { .field-row { grid-template-columns: 1fr 1fr; } }
+  .field { display: grid; gap: 9px; border: 0; padding: 0; margin: 0; min-width: 0; }
+  .field > span, .field legend { font: 500 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0; margin-bottom: 9px; }
+  .field input, .field textarea {
+    width: 100%; font: 400 16px/1.5 var(--sans); color: var(--text); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; transition: border-color .2s, box-shadow .2s;
+  }
+  .field textarea { resize: vertical; min-height: 130px; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--faint); }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(224,122,63,.18); }
+  .field input.bad, .field textarea.bad { border-color: #d9534f; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips label { position: relative; cursor: pointer; }
+  .chips input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .chips span {
+    display: inline-block; font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+    padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); transition: all .2s;
+  }
+  .chips label:hover span { border-color: var(--muted); color: var(--text); }
+  .chips input:checked + span { background: var(--text); border-color: var(--text); color: var(--ink); }
+  .chips input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .honey { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; }
+  .form-foot .btn { border: 0; cursor: pointer; font-family: var(--mono); }
+  .form-foot .btn[disabled] { opacity: .6; cursor: progress; }
+  .form-status { margin: 0; font-size: 14px; color: var(--muted); }
+  .form-status.ok { color: #8fd19e; }
+  .form-status.err { color: #f0a29c; }
+  .form-status a { color: inherit; }
+  .cta-form.sent .field, .cta-form.sent .field-row { opacity: .45; pointer-events: none; }
   .contact-mail {
     font: 400 clamp(20px, 2.2vw, 28px)/1.2 var(--serif); text-decoration: none; overflow-wrap: anywhere; color: var(--muted);
     background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 2px no-repeat; transition: background-size .5s cubic-bezier(.2,.7,.2,1), color .3s;
@@ -355,7 +400,7 @@
     html.has-cursor .cursor { display: block; }
   }
   .cursor { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; transition: opacity .3s; }
-  .cursor.off { opacity: 0; }
+  .cursor.off, .cursor.in-field { opacity: 0; }
   .cursor-dot {
     position: fixed; left: 0; top: 0; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%;
     background: var(--text); box-shadow: 0 0 0 1px rgba(14,11,10,.5); will-change: transform; transition: opacity .25s;
@@ -785,11 +830,49 @@
     <span class="label rv">(Start a project)</span>
     <h2 class="cta-line rv">Got a project<br>in <em>mind?</em></h2>
     <div class="cta-row rv">
-      <p>Environment art, cinematics, or a small game. Tell the studio what you're making.</p>
-      <div class="cta-actions">
-        <a class="btn solid" href="mailto:designdstudio.business@gmail.com">Email the studio ↗</a>
-        <a class="contact-mail" href="mailto:designdstudio.business@gmail.com">designdstudio.business<wbr>@gmail.com</a>
+      <!-- Left: what to send, and the other ways in -->
+      <div class="cta-info">
+        <p>Environment art, cinematics, or a small game. Tell the studio what you're making, and the reply comes straight back to your inbox.</p>
+        <dl class="cta-details">
+          <dt>Email</dt>
+          <dd>
+            <a class="contact-mail" href="mailto:designdstudio.business@gmail.com">designdstudio.business<wbr>@gmail.com</a>
+            <button type="button" class="copy" id="copyMail" data-mail="designdstudio.business@gmail.com">Copy</button>
+          </dd>
+          <dt>Works in</dt><dd>Unreal Engine 5, Unity, Blender</dd>
+          <dt>Elsewhere</dt>
+          <dd class="cta-links">
+            <a href="https://www.youtube.com/@designd_studio" target="_blank" rel="noopener">YouTube ↗</a>
+            <a href="https://designdstudio.itch.io" target="_blank" rel="noopener">itch.io ↗</a>
+            <a href="https://x.com/designd_studio" target="_blank" rel="noopener">X ↗</a>
+          </dd>
+        </dl>
       </div>
+
+      <!-- Right: the form. Sent through FormSubmit, which forwards it to the
+           studio inbox, so the page needs no server of its own. -->
+      <form class="cta-form" id="contactForm" novalidate>
+        <div class="field-row">
+          <label class="field"><span>Your name</span><input name="name" autocomplete="name" required></label>
+          <label class="field"><span>Your email</span><input name="email" type="email" autocomplete="email" required></label>
+        </div>
+        <fieldset class="field">
+          <legend>What's it about?</legend>
+          <div class="chips">
+            <label><input type="radio" name="project" value="Environment art" checked><span>Environment art</span></label>
+            <label><input type="radio" name="project" value="Cinematic"><span>Cinematic</span></label>
+            <label><input type="radio" name="project" value="Game"><span>Game</span></label>
+            <label><input type="radio" name="project" value="Something else"><span>Something else</span></label>
+          </div>
+        </fieldset>
+        <label class="field"><span>Message</span><textarea name="message" rows="5" required placeholder="What are you making, and when do you need it?"></textarea></label>
+        <!-- Spam trap: hidden from people, filled in by bots. -->
+        <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="form-foot">
+          <button class="btn solid" type="submit" id="sendBtn">Send message ↗</button>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        </div>
+      </form>
     </div>
   </div>
 </section>
@@ -970,7 +1053,8 @@
       if (el.closest('.media video')) return 'Play';
       if (el.closest('.stills button, .props button')) return 'View';
       if (el.closest('.asset-card')) return 'Watch';
-      if (el.closest('.contact-mail, .cta .btn')) return 'Email';
+      if (el.closest('#sendBtn')) return 'Send';
+      if (el.closest('.contact-mail')) return 'Email';
       return '';
     };
 
@@ -987,6 +1071,8 @@
       cur.classList.toggle('is-label', !!text);
       cur.classList.toggle('is-hover', !text && !!t.closest('a, button, [role=button]'));
       cur.classList.toggle('on-light', !!t.closest('.light'));
+      // In a text box the normal I-beam is what people need to aim with.
+      cur.classList.toggle('in-field', !!t.closest('input, textarea'));
     });
     // Leaving the window, or moving into a YouTube iframe (which takes the
     // mouse away from this page), hides it instead of leaving it stranded.
@@ -1054,6 +1140,70 @@
       requestAnimationFrame(step);
     });
   }
+
+  // ---- Contact form ----
+  // Sent to FormSubmit's AJAX endpoint, which emails it to the studio inbox,
+  // so visitors never leave the page. Their address is set as the reply-to,
+  // so answering the email answers them.
+  const MAIL = 'designdstudio.business@gmail.com';
+  const form = document.getElementById('contactForm');
+  const status = document.getElementById('formStatus');
+  const sendBtn = document.getElementById('sendBtn');
+  const say = (text, kind) => { status.className = 'form-status ' + (kind || ''); status.innerHTML = text; };
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const f = form.elements;
+    // Check the three things that matter, and point at whichever is missing.
+    const bad = [];
+    if (!f.name.value.trim()) bad.push(f.name);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value.trim())) bad.push(f.email);
+    if (f.message.value.trim().length < 5) bad.push(f.message);
+    [f.name, f.email, f.message].forEach(el => el.classList.toggle('bad', bad.includes(el)));
+    if (bad.length) { say('Please fill in ' + (bad.length > 1 ? 'the highlighted fields.' : 'the highlighted field.'), 'err'); bad[0].focus(); return; }
+    if (f._honey.value) return;   // a bot filled the hidden field: drop it quietly
+
+    sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; say('');
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/' + MAIL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name: f.name.value.trim(),
+          email: f.email.value.trim(),
+          _replyto: f.email.value.trim(),
+          project: f.project.value,
+          message: f.message.value.trim(),
+          _subject: `New enquiry (${f.project.value}) from designd-studio.com`,
+          _template: 'table',
+          _captcha: 'false'
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && String(data.success) === 'true') {
+        form.classList.add('sent');
+        sendBtn.textContent = 'Sent ✓';
+        say('Thanks - your message is on its way. The reply will come to the address you gave.', 'ok');
+      } else {
+        throw new Error(data.message || 'not sent');
+      }
+    } catch (err) {
+      sendBtn.disabled = false; sendBtn.textContent = 'Send message ↗';
+      say(`That didn't go through. You can email <a href="mailto:${MAIL}">${MAIL}</a> directly instead.`, 'err');
+    }
+  });
+  ['name', 'email', 'message'].forEach(n => form.elements[n].addEventListener('input', e => e.target.classList.remove('bad')));
+
+  // Copy the address with one click.
+  const copyBtn = document.getElementById('copyMail');
+  copyBtn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(copyBtn.dataset.mail); }
+    catch (e) {
+      const t = document.createElement('textarea'); t.value = copyBtn.dataset.mail;
+      document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+    }
+    copyBtn.textContent = 'Copied'; copyBtn.classList.add('done');
+    setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('done'); }, 1800);
+  });
 
   // Fade sections in as they arrive.
   const io = new IntersectionObserver(es => es.forEach(e => {
