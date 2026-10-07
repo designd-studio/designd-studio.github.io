@@ -732,9 +732,19 @@
       names.forEach((li, i) => li.classList.toggle('on', i === shot));
 
       if (film.duration) {
-        const target = p * (film.duration - 0.05);
-        shown += (target - shown) * 0.25;
-        if (Math.abs(film.currentTime - shown) > 1 / 30) film.currentTime = shown;
+        if (p < 0.02) {
+          // Resting at the top: play the island shot on its own, looping its
+          // first four seconds, so the page never opens on a frozen frame.
+          if (film.paused) film.play().catch(() => {});
+          if (film.currentTime > 3.9) film.currentTime = 0;
+          shown = film.currentTime;
+        } else {
+          // Scrolling: the scroll position drives the film instead.
+          if (!film.paused) film.pause();
+          const target = p * (film.duration - 0.05);
+          shown += (target - shown) * 0.25;
+          if (Math.abs(film.currentTime - shown) > 1 / 30) film.currentTime = shown;
+        }
       }
       requestAnimationFrame(tick);
     }
