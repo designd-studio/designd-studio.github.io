@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DesignD Studio</title>
-<meta name="description" content="Unreal Engine 5 environments and small, finished Unity games by DesignD Studio.">
+<meta name="description" content="Unreal Engine 5 environments and small, finished Unity games by DesignD Studio - Izzi, environment artist and game developer.">
 <meta property="og:title" content="DesignD Studio">
 <meta property="og:description" content="Unreal Engine 5 environments and small, finished Unity games.">
 <meta property="og:image" content="https://designd-studio.com/assets/ue/island-1.jpg">
@@ -388,7 +388,10 @@
   footer .wrap { display: grid; gap: 28px; align-items: end; }
   @media (min-width: 760px) { footer .wrap { grid-template-columns: 1fr auto; } }
   .foot-mail { display: grid; gap: 10px; }
-  footer small { color: var(--faint); font: 400 12px/1 var(--mono); grid-column: 1 / -1; padding-top: 22px; border-top: 1px solid var(--line); }
+  footer small { color: var(--faint); font: 400 12px/1.6 var(--mono); grid-column: 1 / -1; padding-top: 22px; border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+  footer small .sig b { color: var(--text); font-weight: 500; }
+  .about .lead .who { color: var(--accent); font-style: italic; }
 
   /* Round icon buttons. On hover each fills with its own brand colour. */
   .foot-icons, .cta-links { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -811,12 +814,12 @@
   <div class="wrap about">
     <div class="rv">
       <span class="label">04 / About</span>
-      <p class="lead">DesignD Studio makes places to look at in Unreal Engine, and games to sit in with Unity.</p>
+      <p class="lead">DesignD Studio is <span class="who">Izzi</span>, an environment artist and game developer, making places to look at in Unreal Engine and games to sit in with Unity.</p>
     </div>
     <div class="rv">
       <p>The Unreal work is environments made to be filmed: laid out for the camera, dressed, lit, shot in Sequencer and cut to music. Each one is a short film, not a turntable.</p>
       <p>The games are small on purpose. Each one is finished and released, and each is as calm or as tense as it set out to be: a beach that lives at the bottom of your screen, a night shift you have to keep someone through, a jar that fills with rain.</p>
-      <p>Everything is made in one studio, from the models and the levels to the code, sound, edits and trailers.</p>
+      <p>It is a studio of one: Izzi makes everything here, from the models and the levels to the code, sound, edits and trailers.</p>
     </div>
   </div>
 
@@ -858,7 +861,7 @@
     <div class="cta-row rv">
       <!-- Left: what to send, and the other ways in -->
       <div class="cta-info">
-        <p>Environment art, cinematics, or a small game. Tell the studio what you're making, and the reply comes straight back to your inbox.</p>
+        <p>Environment art, cinematics, or a small game. Tell Izzi what you're making, and the reply comes straight back to your inbox.</p>
         <dl class="cta-details">
           <dt>Email</dt>
           <dd>
@@ -915,7 +918,7 @@
       <a class="ico ico-itch" href="https://designdstudio.itch.io" target="_blank" rel="noopener" aria-label="itch.io" title="itch.io"><svg><use href="#i-itch"/></svg></a>
       <a class="ico ico-x" href="https://x.com/designd_studio" target="_blank" rel="noopener" aria-label="X" title="X"><svg><use href="#i-x"/></svg></a>
     </nav>
-    <small>© 2026 DesignD Studio</small>
+    <small><span>© 2026 DesignD Studio</span><span class="sig"><b>Izzi</b> · Environment Artist &amp; Game Developer</span></small>
   </div>
 </footer>
 
