@@ -278,13 +278,38 @@
   .props button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* ---------- contact ---------- */
-  .contact { padding-bottom: clamp(80px, 12vw, 140px); display: grid; gap: 18px; justify-items: start; }
+  /* ---------- ticker ---------- */
+  .ticker { overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: clamp(18px, 2.4vw, 30px) 0; }
+  .ticker-track { display: flex; width: max-content; will-change: transform; }
+  .ticker-set { display: flex; align-items: center; flex: none; }
+  .ticker span { font: 400 clamp(38px, 5.4vw, 80px)/1 var(--serif); white-space: nowrap; padding: 0 clamp(18px, 2.2vw, 34px); }
+  /* Every other word is drawn in outline, so the strip has a rhythm. */
+  .ticker span:nth-of-type(even) { color: transparent; -webkit-text-stroke: 1px rgba(246,240,234,.55); font-style: italic; }
+  /* Separator: the mark's two D's, drawn small. */
+  .ticker i { flex: none; width: 34px; height: 22px; display: block;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 100'%3E%3Cpath d='M18 8 H50 A42 42 0 0 1 50 92 H18 Z M35 26 H49 A24 24 0 0 1 49 74 H35 Z' fill-rule='evenodd' fill='%23F6F0EA'/%3E%3Cpath d='M18 8 H50 A42 42 0 0 1 50 92 H18 Z M35 26 H49 A24 24 0 0 1 49 74 H35 Z' fill-rule='evenodd' fill='%23E07A3F' transform='translate(150,0) scale(-1,1)'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+  /* ---------- the one light section (Paper) ---------- */
+  .light { background: var(--text); color: var(--ink); }
+  .light .label { color: #8b7d73; }
+  .light .head p { color: #5c4e46; }
+  .light .props button { background: #e7ded4; }
+  #props.light { border-bottom: 0; }
+
+  /* ---------- closing call to action ---------- */
+  .cta { padding: clamp(90px, 13vw, 180px) 0 clamp(80px, 11vw, 150px); border-top: 1px solid var(--line); }
+  .cta-line { font: 400 clamp(60px, 12vw, 190px)/.92 var(--serif); margin: 20px 0 clamp(36px, 5vw, 64px); letter-spacing: -.02em; }
+  .cta-line em { color: var(--accent); }
+  .cta-row { display: grid; gap: 26px; border-top: 1px solid var(--line); padding-top: 30px; }
+  @media (min-width: 900px) { .cta-row { grid-template-columns: 1fr auto; align-items: center; } }
+  .cta-row p { color: var(--muted); margin: 0; max-width: 42ch; font-size: 17px; }
+  .cta-actions { display: grid; gap: 14px; justify-items: start; }
+  @media (min-width: 900px) { .cta-actions { justify-items: end; } }
   .contact-mail {
-    font: 400 clamp(30px, 6vw, 88px)/1.05 var(--serif); text-decoration: none; overflow-wrap: anywhere;
+    font: 400 clamp(20px, 2.2vw, 28px)/1.2 var(--serif); text-decoration: none; overflow-wrap: anywhere; color: var(--muted);
     background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 2px no-repeat; transition: background-size .5s cubic-bezier(.2,.7,.2,1), color .3s;
   }
   .contact-mail:hover { color: var(--accent); background-size: 100% 2px; }
-  .contact p { color: var(--muted); margin: 0; }
 
   /* ---------- about ---------- */
   .about { display: grid; gap: 40px; padding-bottom: clamp(56px, 7vw, 88px); }
@@ -371,6 +396,11 @@
      round button steps aside on hover instead of stacking under it. */
   html.has-cursor .player:hover .play { opacity: 0; transform: scale(.6); }
   .player .play { transition: transform .3s, background .3s, opacity .3s; }
+  /* On the light Paper section the paper D and dot would vanish, so they
+     switch to Ink there. */
+  .cursor.on-light .cursor-d.l { border-color: var(--ink); }
+  .cursor.on-light .cursor-dot { background: var(--ink); box-shadow: 0 0 0 1px rgba(246,240,234,.5); }
+  .cursor.on-light .cursor-lens { filter: none; }
   /* Pressing: the D's snap shut. */
   .cursor.is-down .cursor-d.l { transform: translateX(2px) scale(.85); }
   .cursor.is-down .cursor-d.r { transform: translateX(-2px) scale(.85); }
@@ -436,13 +466,23 @@
     </div>
   </div>
   <dl class="stats wrap">
-    <div><dt>3</dt><dd>UE5 environment films</dd></div>
-    <div><dt>3</dt><dd>Games released</dd></div>
-    <div><dt>4K</dt><dd>Cinematic renders</dd></div>
-    <div><dt>1</dt><dd>Studio, start to finish</dd></div>
+    <div><dt data-to="3">3</dt><dd>UE5 environment films</dd></div>
+    <div><dt data-to="3">3</dt><dd>Games released</dd></div>
+    <div><dt data-to="4" data-suffix="K">4K</dt><dd>Cinematic renders</dd></div>
+    <div><dt data-to="1">1</dt><dd>Studio, start to finish</dd></div>
   </dl>
  </div>
 </section>
+
+<!-- Ticker: what the studio does, running past. Script fills the track. -->
+<div class="ticker" role="marquee" aria-label="Unreal Engine 5, environment art, cinematics, Unity, game design, pixel art, Blender, sound and edit">
+  <div class="ticker-track" aria-hidden="true">
+    <div class="ticker-set">
+      <span>Unreal Engine 5</span><i></i><span>Environment art</span><i></i><span>Cinematics</span><i></i><span>Unity</span><i></i>
+      <span>Game design</span><i></i><span>Pixel art</span><i></i><span>Blender</span><i></i><span>Sound &amp; edit</span><i></i>
+    </div>
+  </div>
+</div>
 
 <!-- ======================= ENVIRONMENTS ======================= -->
 <section class="block" id="environments">
@@ -675,7 +715,7 @@
 </section>
 
 <!-- ======================= PROPS ======================= -->
-<section class="block" id="props" data-gallery="props">
+<section class="block light" id="props" data-gallery="props">
   <div class="wrap">
     <div class="head rv">
       <div>
@@ -737,11 +777,20 @@
       </div>
     </div>
   </div>
+</section>
 
-  <div class="wrap contact rv" id="contact">
-    <span class="label">Contact</span>
-    <a class="contact-mail" href="mailto:designdstudio.business@gmail.com">designdstudio.business<wbr>@gmail.com</a>
-    <p>For environment art, cinematics and small game work.</p>
+<!-- ======================= CONTACT: the closing ask ======================= -->
+<section class="cta" id="contact">
+  <div class="wrap">
+    <span class="label rv">(Start a project)</span>
+    <h2 class="cta-line rv">Got a project<br>in <em>mind?</em></h2>
+    <div class="cta-row rv">
+      <p>Environment art, cinematics, or a small game. Tell the studio what you're making.</p>
+      <div class="cta-actions">
+        <a class="btn solid" href="mailto:designdstudio.business@gmail.com">Email the studio ↗</a>
+        <a class="contact-mail" href="mailto:designdstudio.business@gmail.com">designdstudio.business<wbr>@gmail.com</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -921,7 +970,7 @@
       if (el.closest('.media video')) return 'Play';
       if (el.closest('.stills button, .props button')) return 'View';
       if (el.closest('.asset-card')) return 'Watch';
-      if (el.closest('.contact-mail')) return 'Email';
+      if (el.closest('.contact-mail, .cta .btn')) return 'Email';
       return '';
     };
 
@@ -937,6 +986,7 @@
       label.classList.toggle('is-play', text === 'Play');
       cur.classList.toggle('is-label', !!text);
       cur.classList.toggle('is-hover', !text && !!t.closest('a, button, [role=button]'));
+      cur.classList.toggle('on-light', !!t.closest('.light'));
     });
     // Leaving the window, or moving into a YouTube iframe (which takes the
     // mouse away from this page), hides it instead of leaving it stranded.
@@ -965,6 +1015,44 @@
     lb.addEventListener('close', () => document.documentElement.classList.add('has-cursor'));
     document.querySelectorAll('.stills button, .props button').forEach(b =>
       b.addEventListener('click', () => document.documentElement.classList.remove('has-cursor')));
+  }
+
+  // ---- Ticker ----
+  // One set of words is cloned until the strip is at least twice the screen
+  // wide, then the track slides left and wraps by one set's width, so the
+  // seam never shows. Scrolling adds speed, and scrolling up runs it backwards.
+  const track = document.querySelector('.ticker-track');
+  const tickSet = track.querySelector('.ticker-set');
+  while (track.scrollWidth < innerWidth * 2 + tickSet.offsetWidth) track.appendChild(tickSet.cloneNode(true));
+  if (!reduced) {
+    let x = 0, dir = 1, lastY2 = scrollY;
+    const run = () => {
+      const dy = scrollY - lastY2; lastY2 = scrollY;
+      if (dy) dir = dy > 0 ? 1 : -1;
+      x -= dir * (0.6 + Math.min(Math.abs(dy) * 0.25, 18));
+      const w = tickSet.offsetWidth;
+      if (x <= -w) x += w;
+      if (x > 0) x -= w;
+      track.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
+      requestAnimationFrame(run);
+    };
+    run();
+  }
+
+  // ---- Stats count up from zero as the page opens ----
+  if (!reduced) {
+    document.querySelectorAll('.stats dt[data-to]').forEach((dt, i) => {
+      const to = +dt.dataset.to, suffix = dt.dataset.suffix || '';
+      const start = performance.now() + 700 + i * 120, dur = 1300;
+      dt.textContent = '0' + suffix;
+      const step = now => {
+        const t = Math.min(1, Math.max(0, (now - start) / dur));
+        const eased = 1 - Math.pow(1 - t, 3);
+        dt.textContent = Math.round(to * eased) + suffix;
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
   }
 
   // Fade sections in as they arrive.
