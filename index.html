@@ -225,6 +225,19 @@
     background: rgba(0,0,0,.45); padding: 7px 10px; border-radius: 4px;
   }
 
+  /* A film that isn't public yet: a badge instead of a play button. */
+  .player .soon { display: none; }
+  .player[data-yt=""] .play { display: none; }
+  .player[data-yt=""] .soon {
+    display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text); white-space: nowrap;
+    background: rgba(14,11,10,.6); backdrop-filter: blur(8px); border: 1px solid rgba(246,240,234,.18);
+    padding: 13px 18px; border-radius: 999px;
+  }
+  .player[data-yt=""] .soon::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 10px; vertical-align: 1px; }
+  .player[data-yt=""] { cursor: default; }
+  .player.nudge .soon { animation: nudge .5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes nudge { 30% { transform: translate(-50%, -50%) scale(1.08); } }
   .env-body { display: grid; gap: 28px; margin-top: 32px; }
   @media (min-width: 900px) { .env-body { grid-template-columns: 5fr 7fr; gap: 56px; } }
   .env-body h3 { font: 400 clamp(34px, 4.2vw, 58px)/1 var(--serif); margin: 12px 0 0; }
@@ -540,7 +553,7 @@
     </div>
   </div>
   <dl class="stats wrap">
-    <div><dt data-to="3">3</dt><dd>UE5 environment films</dd></div>
+    <div><dt data-to="4">4</dt><dd>UE5 environment films</dd></div>
     <div><dt data-to="3">3</dt><dd>Games released</dd></div>
     <div><dt data-to="4" data-suffix="K">4K</dt><dd>Cinematic renders</dd></div>
     <div><dt data-to="1">1</dt><dd>Studio, start to finish</dd></div>
@@ -568,6 +581,34 @@
       </div>
       <p>Each one is built, lit, and shot as a short film in Unreal Engine 5, from the layout and set dressing to the lighting, camera work and grade.</p>
     </div>
+
+    <!-- Some Places Are Heard (newest). data-yt stays empty until the film is
+         public on YouTube; until then the player says "Coming soon". -->
+    <article class="env" data-gallery="forest">
+      <div class="player rv" data-yt="" role="button" tabindex="0" aria-label="Some Places Are Heard, coming soon">
+        <img src="assets/ue/forest-1.jpg" alt="Sunlight on a fast forest river between pines" loading="lazy" width="1920" height="817">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg></span>
+        <span class="runtime">1:46 · 1440p</span>
+        <span class="soon">Premieres soon on YouTube</span>
+      </div>
+      <div class="env-body rv">
+        <div>
+          <span class="label">2026 · Environment film · New</span>
+          <h3>Some Places Are Heard</h3>
+        </div>
+        <div>
+          <p>A forest river followed from the water's edge, up through the mist, past an old log cabin and out to the sea. Built and rendered in Unreal Engine 5.8, then graded in DaVinci Resolve.</p>
+          <p>The sound is part of the place: the river grows louder and brighter as the camera nears the water, and falls to a distant hush as it pulls away.</p>
+          <ul class="tags"><li>UE 5.8</li><li>Lumen</li><li>Water</li><li>Volumetric fog</li><li>Sequencer</li><li>DaVinci grade</li><li>Sound design</li></ul>
+          <div class="stills">
+            <button data-full="assets/ue/forest-2.jpg" aria-label="View still 1"><img src="assets/ue/forest-2.jpg" alt="Sun breaking through mist above the river" loading="lazy"></button>
+            <button data-full="assets/ue/forest-3.jpg" aria-label="View still 2"><img src="assets/ue/forest-3.jpg" alt="A bank of fog between dark pines" loading="lazy"></button>
+            <button data-full="assets/ue/forest-4.jpg" aria-label="View still 3"><img src="assets/ue/forest-4.jpg" alt="An old log cabin in long grass" loading="lazy"></button>
+            <button data-full="assets/ue/forest-5.jpg" aria-label="View still 4"><img src="assets/ue/forest-5.jpg" alt="Sun rising over the forest canopy" loading="lazy"></button>
+          </div>
+        </div>
+      </div>
+    </article>
 
     <!-- Lost on the Island -->
     <article class="env" data-gallery="island">
@@ -835,7 +876,7 @@
       <span class="label">Timeline</span>
       <ol class="timeline">
         <li><b>2025</b><span><i>Lost on the Island</i>, <i>Melancholy Hill</i>, and <i>The Alley</i> parts one and two.</span></li>
-        <li><b>2026</b><span>Three games released on itch.io: <i>Rain Jar</i>, <i>Tidewrack</i> and <i>Night Shift</i>.</span></li>
+        <li><b>2026</b><span>Three games released on itch.io: <i>Rain Jar</i>, <i>Tidewrack</i> and <i>Night Shift</i>. A new forest film, <i>Some Places Are Heard</i>, in Unreal Engine 5.8.</span></li>
         <li><b>Now</b><span>Building <i>Wildcode</i>, a creature-raising RPG in 3D.</span></li>
       </ol>
     </div>
@@ -1001,6 +1042,8 @@
   // heavy iframes up front (and nothing goes to YouTube until someone asks).
   document.querySelectorAll('.player[data-yt]').forEach(p => {
     const start = () => {
+      // No video ID yet (the film isn't public): give the "coming soon" badge a nudge instead.
+      if (!p.dataset.yt) { p.classList.remove('nudge'); void p.offsetWidth; p.classList.add('nudge'); return; }
       if (p.querySelector('iframe')) return;
       const f = document.createElement('iframe');
       f.src = `https://www.youtube-nocookie.com/embed/${p.dataset.yt}?autoplay=1&rel=0`;
@@ -1082,7 +1125,8 @@
 
     // What each kind of thing under the pointer should say.
     const labelFor = el => {
-      if (el.closest('.player')) return 'Play';
+      // An unpublished film already says "Premieres soon" on its badge.
+      if (el.closest('.player')) return el.closest('.player').dataset.yt ? 'Play' : '';
       if (el.closest('.media video')) return 'Play';
       if (el.closest('.stills button, .props button')) return 'View';
       if (el.closest('.asset-card')) return 'Watch';
