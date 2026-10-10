@@ -295,6 +295,22 @@
   }
   .props button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+  /* Featured asset (the cabin): big render, text, and a strip of details */
+  .feature { display: grid; gap: 22px; margin-bottom: clamp(48px, 6vw, 80px); }
+  @media (min-width: 980px) { .feature { grid-template-columns: 7fr 5fr; gap: 22px 52px; } .feature-thumbs { grid-column: 1 / -1; } }
+  .feature button { position: relative; padding: 0; border: 0; cursor: zoom-in; overflow: hidden; border-radius: 6px; background: #3a2a23; display: block; width: 100%; }
+  .feature img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  .feature button:hover img, .feature button:focus-visible img { transform: scale(1.04); }
+  .feature-main button { aspect-ratio: 1408 / 768; }
+  .feature-main span { position: absolute; left: 12px; bottom: 12px; font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text); background: rgba(14,11,10,.7); padding: 7px 10px; border-radius: 4px; }
+  .feature-text h3 { font: 400 clamp(34px, 4vw, 54px)/1 var(--serif); margin: 12px 0 16px; }
+  .feature-text p { color: #cdb9ac; margin: 0 0 14px; }
+  .feature-text a { color: var(--accent); }
+  .feature-text .credit { font-size: 13px; color: #9c8577; margin-top: 16px; }
+  .feature-thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 700px) { .feature-thumbs { grid-template-columns: repeat(4, 1fr); } }
+  .feature-thumbs button { aspect-ratio: 16 / 10; }
+
   /* ---------- contact ---------- */
   /* ---------- ticker ---------- */
   .ticker { overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: clamp(18px, 2.4vw, 30px) 0; }
@@ -838,6 +854,27 @@
       </div>
       <p>Game-ready set dressing made in Blender, textured and exported for Unreal Engine 5: the small things that make a scene look lived in.</p>
     </div>
+    <!-- Featured asset: the log cabin, the same one that appears in Some Places Are Heard. -->
+    <div class="feature rv">
+      <div class="feature-main">
+        <button data-full="assets/props/cabin_ref.jpg"><img src="assets/props/cabin_ref.jpg" alt="A weathered log cabin with a porch, on a grass patch" loading="lazy"><span>Log cabin</span></button>
+      </div>
+      <div class="feature-text">
+        <span class="label">Featured asset · Blender to Unreal Engine 5</span>
+        <h3>The log cabin</h3>
+        <p>A game-ready cabin built in Blender for Unreal Engine 5, and the same cabin that stands in <a href="#environments">Some Places Are Heard</a>.</p>
+        <p>Axe-cut notches where the logs cross, warped and chipped boards, and grime baked into the mesh: mud splashed up the base, water streaks under the sills, polished wear on the door ring and steps. Every material is a tweakable instance in Unreal.</p>
+        <ul class="tags"><li>Nanite</li><li>~2.9M tris</li><li>7 PBR materials</li><li>Baked vertex grime</li><li>UE import script</li></ul>
+        <p class="credit">Textures: CC0 scans from Poly Haven.</p>
+      </div>
+      <div class="feature-thumbs">
+        <button data-full="assets/props/cabin_close.jpg"><img src="assets/props/cabin_close.jpg" alt="The cabin's porch, door and log corners" loading="lazy"></button>
+        <button data-full="assets/props/cabin_detail.jpg"><img src="assets/props/cabin_detail.jpg" alt="Close-up of axe-notched log ends" loading="lazy"></button>
+        <button data-full="assets/props/cabin_chimney.jpg"><img src="assets/props/cabin_chimney.jpg" alt="The stone chimney and shingle roof" loading="lazy"></button>
+        <button data-full="assets/props/cabin_back.jpg"><img src="assets/props/cabin_back.jpg" alt="The back of the cabin and its roof" loading="lazy"></button>
+      </div>
+    </div>
+
     <div class="props rv">
       <button data-full="assets/props/lantern_lit.jpg"><img src="assets/props/lantern_lit.jpg" alt="A lit oil lantern with a glass chimney" loading="lazy"><span>Lantern</span></button>
       <button data-full="assets/props/crate_final.jpg"><img src="assets/props/crate_final.jpg" alt="A slatted wooden crate" loading="lazy"><span>Crate</span></button>
@@ -1067,8 +1104,8 @@
     lbAlt.textContent = lbImg.alt;
     lbCount.textContent = `${idx + 1} / ${set.length}`;
   };
-  document.querySelectorAll('.stills button, .props button').forEach(b => b.addEventListener('click', () => {
-    set = [...b.closest('[data-gallery]').querySelectorAll('.stills button, .props button')];
+  document.querySelectorAll('.stills button, .props button, .feature button').forEach(b => b.addEventListener('click', () => {
+    set = [...b.closest('[data-gallery]').querySelectorAll('.stills button, .props button, .feature button')];
     show(set.indexOf(b)); lb.showModal();
   }));
   document.getElementById('lb-prev').onclick = () => show(idx - 1);
@@ -1127,7 +1164,7 @@
       // An unpublished film already says "Premieres soon" on its badge.
       if (el.closest('.player')) return el.closest('.player').dataset.yt ? 'Play' : '';
       if (el.closest('.media video')) return 'Play';
-      if (el.closest('.stills button, .props button')) return 'View';
+      if (el.closest('.stills button, .props button, .feature button')) return 'View';
       if (el.closest('.asset-card')) return 'Watch';
       if (el.closest('#sendBtn')) return 'Send';
       if (el.closest('.contact-mail')) return 'Email';
@@ -1175,7 +1212,7 @@
     // The photo viewer sits in the browser's top layer, above the cursor, so
     // while it is open the normal pointer comes back.
     lb.addEventListener('close', () => document.documentElement.classList.add('has-cursor'));
-    document.querySelectorAll('.stills button, .props button').forEach(b =>
+    document.querySelectorAll('.stills button, .props button, .feature button').forEach(b =>
       b.addEventListener('click', () => document.documentElement.classList.remove('has-cursor')));
   }
 
